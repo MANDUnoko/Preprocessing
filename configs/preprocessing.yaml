@@ -10,11 +10,42 @@ window:
   experiments:
     - [0, 80]
     - [0, 200]
+    - [-40, 160]
 
 shape:
   volume: [140, 250, 250]
   slice:  [250, 250]
-  
+
 projections:
   axes: [0,1,2]   # Z, Y, X
   methods: [mip, aip, mid]
+
+# 히스토그램 시각화 옵션
+# SHOW_HIST: 볼륨 값 분포를 시각화할지 여부
+# HIST_BINS: 히스토그램의 막대 수
+# HIST_EXPS: W_EXP 리스트 중 어떤 실험 채널을 분석할지 지정
+# EQUALIZE_HIST: True 시, 히스토그램 균등화(equalization) 후 원본 vs 균등화된 분포 비교
+visualization:
+  show_hist: true       # 히스토그램 시각화 여부
+  hist_bins: 100        # 히스토그램 bin 개수
+  hist_exps: [0]        # W_EXP 리스트 중 시각화할 인덱스
+  equalize_hist: true  # 히스토그램 균등화 여부
+
+  show_proj: true       # 프로젝션 비교 시각화 여부
+  proj_axes: [0,1,2]    # 프로젝션 축 목록
+  proj_methods: [mip, aip, mid]  # 프로젝션 방식
+
+  show_slice:    true           # True 면 슬라이스 비교 그림
+  slice_axes:    [0,1,2]        # Z, Y, X 축 중 어떤 축 볼지
+  # slice_indices 를 지정하지 않으면 중앙 슬라이스 자동 사용
+  slice_indices: [70, 125, 125]
+
+
+# Analysis 설정 (ROI 기반 지표 계산)
+analysis:
+  compute_roi_metrics: true         # True 면 ROI 기반 SNR/CNR 계산
+  roi_mask_source: "mask"           # "mask": lesion mask, "brain_mask": skull‑strip mask, 또는 파일 경로
+  background_mask_source: "invert"  # "invert": roi_mask을 반전, "outside_brain": brain_mask 반전, 또는 파일 경로
+  noise_region: "background"            # SNR 계산 시 분산(노이즈) 추출 영역: "volume" 또는 "background"
+
+
