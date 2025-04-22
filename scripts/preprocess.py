@@ -57,16 +57,6 @@ SHOW_HIST     = viz_cfg.get("show_hist", False)
 HIST_BINS     = viz_cfg.get("hist_bins", 100)
 HIST_EXPS     = viz_cfg.get("hist_exps", [0])
 EQUALIZE_HIST = viz_cfg.get("equalize_hist", False)
-SHOW_SLICE    = viz_cfg.get("show_slice", False)
-SLICE_AXES    = viz_cfg.get("slice_axes", AXES)
-SLICE_INDICES = viz_cfg.get("slice_indices", None)
-
-# 분석 설정 (configs/preprocessing.yaml 내 analysis 블록)
-analysis_cfg           = cfg.get("analysis", {})
-COMPUTE_ROI            = analysis_cfg.get("compute_roi_metrics", False)
-ROI_MASK_SOURCE        = analysis_cfg.get("roi_mask_source", "mask")
-BACKGROUND_MASK_SOURCE = analysis_cfg.get("background_mask_source", "invert")
-NOISE_REGION           = analysis_cfg.get("noise_region", "volume")
 
 # ============================================
 # 1. 케이스 순회
@@ -189,68 +179,7 @@ for case_id in case_ids:
         plt.legend()
         plt.title(f"Case {case_id} Histogram")
         plt.show()
-        
-    # --- 7.7 ROI 기반 SNR/CNR 측정 섹션 ---
-    if COMPUTE_ROI:
-        # 1) ROI 마스크 로드
-        #    roi_mask_source: "mask" 이면 위에서 load_nifti_as_array로 읽은 mask_r 사용
-        #                   "brain_mask" 이면 brainm_r 사용
-        #                   그 외 문자열이면 Path(cfg["analysis"]["roi_mask_source"]) 경로에서 nibabel 로드
-        if ROI_MASK_SOURCE == "mask":
-            roi_mask = mask_r > 0
-        elif ROI_MASK_SOURCE == "brain_mask":
-            roi_mask = brainm_r > 0
-        else:
-            roi_mask = nib.load(str(Path(ROI_MASK_SOURCE))).get_fdata() > 0
-
-        # 2) 노이즈(배경) 마스크 생성
-        #    background_mask_source: "invert" → roi_mask 반전, "outside_brain" → brain mask 반전,
-        #                            그 외 문자열은 해당 파일 로드
-        if BACKGROUND_MASK_SOURCE == "invert":
-            bg_mask = ~roi_mask
-        elif BACKGROUND_MASK_SOURCE == "outside_brain":
-            bg_mask = nib.load(str(Path(cfg["analysis"]["roi_mask_source"]))).get_fdata() == 0
-        else:
-            bg_mask = nib.load(str(Path(BACKGROUND_MASK_SOURCE))).get_fdata() > 0
-
-        # 3) SNR/CNR 계산
-        #    mean_signal = 볼륨[roi_mask] 평균
-        #    std_noise   = NOISE_REGION=="volume" → 전체 vol_r.std()
-        #                  "background" → 볼륨[bg_mask].std()
-        vol_flat = vol_s.flatten()  # skull-strip 후 볼륨
-        mean_signal = vol_s[roi_mask].mean()
-        if NOISE_REGION == "background":
-            std_noise = vol_s[bg_mask].std()
-        else:
-            std_noise = vol_s.std()
-        snr = mean_signal / (std_noise + 1e-6)
-
-        mean_bg = vol_s[bg_mask].mean()
-        cnr = abs(mean_signal - mean_bg) / (std_noise + 1e-6)
-
-        # 4) 결과 출력
-        print(f"[ROI Metrics] case={case_id}")
-        print(f"  • Mean(signal): {mean_signal:.4f}")
-        print(f"  • Std(noise):   {std_noise:.4f}  (region={NOISE_REGION})")
-        print(f"  • SNR:          {snr:.4f}")
-        print(f"  • CNR:          {cnr:.4f}")
-     
-    # --- 7.8 시각적 검증: 대표 슬라이스 비교 섹션 ---    
-    if SHOW_SLICE:
-       # 축별 슬라이스 인덱스 결정
-       axes   = SLICE_AXES
-       indices= SLICE_INDICES or [vol_s.shape[a]//2 for a in axes]
-       for axis, idx in zip(axes, indices):
-           # 원본 vs 전처리 슬라이스 추출
-           orig_slice = np.take(vol_r,   idx, axis=axis)
-           proc_slice = np.take(vol_s,   idx, axis=axis)
-           fig, axs = plt.subplots(1,2,figsize=(8,4))
-           axs[0].imshow(orig_slice, cmap='gray')
-           axs[0].set_title(f"ORIG axis={axis}, idx={idx}")
-           axs[1].imshow(proc_slice, cmap='gray')
-           axs[1].set_title(f"PROC axis={axis}, idx={idx}")
-           plt.tight_layout(); plt.show()      
-        
+           
     # ============================================
     # 8. .pt 저장
     # ============================================

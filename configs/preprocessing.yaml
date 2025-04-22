@@ -35,17 +35,6 @@ visualization:
   proj_axes: [0,1,2]    # 프로젝션 축 목록
   proj_methods: [mip, aip, mid]  # 프로젝션 방식
 
-  show_slice:    true           # True 면 슬라이스 비교 그림
-  slice_axes:    [0,1,2]        # Z, Y, X 축 중 어떤 축 볼지
-  # slice_indices 를 지정하지 않으면 중앙 슬라이스 자동 사용
-  slice_indices: [70, 125, 125]
 
-
-# Analysis 설정 (ROI 기반 지표 계산)
-analysis:
-  compute_roi_metrics: true         # True 면 ROI 기반 SNR/CNR 계산
-  roi_mask_source: "mask"           # "mask": lesion mask, "brain_mask": skull‑strip mask, 또는 파일 경로
-  background_mask_source: "invert"  # "invert": roi_mask을 반전, "outside_brain": brain_mask 반전, 또는 파일 경로
-  noise_region: "background"            # SNR 계산 시 분산(노이즈) 추출 영역: "volume" 또는 "background"
 
 
