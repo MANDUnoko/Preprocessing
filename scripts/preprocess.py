@@ -94,20 +94,27 @@ for case_id in case_ids:
     # 최종 볼륨 채널 저장 배열 (C, D, H, W)
     volume_channels = []
     for clip_min, clip_max in W_EXP:
-        wl   = (clip_min + clip_max) / 2
-        ww   = clip_max - clip_min
-        win  = apply_window(vol_s, level=wl, width=ww)
-        norm = normalize_volume(win, clip_min=clip_min, clip_max=clip_max)
+        # ... window & normalize ...
         volume_channels.append(norm)
-    # stack along new channel dim: shape = (len(W_EXP), D, H, W)
-    vol_all = np.stack(volume_channels,  axis=0)
 
     # ============================================
     # 6. Pad / Crop to target volume shape
     # ============================================
-    for i in range(vol_all.shape[0]):
-        vol_all[i] = pad_or_crop_3d(to_standard_axis(vol_all[i]), target_shape=VOL_SHAPE)
-    mask_all = pad_or_crop_3d(to_standard_axis(mask_r), target_shape=VOL_SHAPE)
+    processed_vols = []
+    for norm in volume_channels:
+        aligned = pad_or_crop_3d(
+            to_standard_axis(norm),
+            target_shape=VOL_SHAPE
+        )
+        processed_vols.append(aligned)
+    # 이제야 shape=(len(W_EXP), D', H', W')
+    vol_all = np.stack(processed_vols, axis=0)
+
+    # 라벨도 같은 방식으로
+    mask_all = pad_or_crop_3d(
+        to_standard_axis(mask_r),
+        target_shape=VOL_SHAPE
+    )
 
     # ============================================
     # 7. Projection 생성 (2D 채널)
