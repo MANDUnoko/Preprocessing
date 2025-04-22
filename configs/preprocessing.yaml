@@ -1,0 +1,20 @@
+data_dir: "data"
+
+spacings:
+  original: [5.0, 0.4121, 0.4121]
+  target:   [1.0, 1.0, 1.0]
+
+window:
+  level: 40
+  width: 80
+  experiments:
+    - [0, 80]
+    - [0, 200]
+
+shape:
+  volume: [140, 250, 250]
+  slice:  [250, 250]
+  
+projections:
+  axes: [0,1,2]   # Z, Y, X
+  methods: [mip, aip, mid]
