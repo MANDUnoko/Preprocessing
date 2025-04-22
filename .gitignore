@@ -1,0 +1,64 @@
+# 여기서 무시되어서 업로드 안된 파일은 pull / push 할 때 유실되기 쉬우니 꼭 gitkeep 설정 잘해두기....
+# .gitkeep + backup 체계화 ㅠㅠ
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Virtual environments
+.env/
+venv/
+.venv/
+env/
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# VSCode
+.vscode/
+
+# PyCharm
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# 중요 데이터 무시
+data/raw/*
+data/processed/*
+
+# 폴더 + .gitkeep만 추적
+!data/raw/
+!data/processed/
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# NIfTI and PyTorch files
+*.nii
+*.nii.gz
+*.pt
+
+# Outputs and figures
+outputs/
+notebooks/*.html

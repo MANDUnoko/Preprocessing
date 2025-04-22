@@ -26,7 +26,9 @@ BRAIN_MASK_EXT = ".nii.gz"   # skull‑strip 마스크
 LESION_EXT     = ".nii"      # 병변 마스크 (Label)
 
 # case 리스트
-DATA_DIR    = Path(cfg.get("data_dir", "data"))
+cfg_data_dir = cfg.get("data_dir", "data")
+
+DATA_DIR = Path(os.environ.get("DATA_DIR", cfg_data_dir))
 RAW_DIR     = DATA_DIR / "raw"
 MASK_DIR    = DATA_DIR / "masks"
 OUT_DIR     = DATA_DIR / "processed"
@@ -142,4 +144,4 @@ for case_id in case_ids:
         }
     }, str(out_path))
 
-    print(f"[✔] Saved: {out_path}")
+    print(f"[✔] Saved: {case_id}")
