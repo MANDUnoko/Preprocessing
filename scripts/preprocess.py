@@ -23,7 +23,7 @@ with open(cfg_path) as f:
 # 파일 확장자    
 RAW_EXT        = ".nii.gz"   # 원본 CT
 BRAIN_MASK_EXT = ".nii.gz"   # skull‑strip 마스크
-LESION_EXT     = ".nii.gz"   # 병변 마스크 (Label)
+LESION_EXT     = ".nii"      # 병변 마스크 (Label)
 
 # case 리스트
 cfg_data_dir = cfg.get("data_dir", "data")
