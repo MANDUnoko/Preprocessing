@@ -45,8 +45,8 @@ VOL_SHAPE   = tuple(cfg["shape"]["volume"])  # (D,H,W)
 SLICE_SHAPE = tuple(cfg["shape"]["slice"])   # (H,W)
 
 # projections
-AXES    = cfg["projections"]["axes"]      # [0,1,2]
-METHODS = cfg["projections"]["methods"]   # ["mip","aip","mid"]
+AXES     = cfg["projections"]["axes"]      
+METHODS  = cfg["projections"]["methods"]   
 
 # 시각화 설정 (configs/preprocessing.yaml 내 visualization 블록)
 viz_cfg       = cfg.get("visualization", {})

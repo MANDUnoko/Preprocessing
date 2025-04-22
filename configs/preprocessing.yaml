@@ -28,8 +28,8 @@ projections:
 visualization:
   show_hist: true       # 히스토그램 시각화 여부
   hist_bins: 100        # 히스토그램 bin 개수
-  hist_exps: [0]        # W_EXP 리스트 중 시각화할 인덱스
-  equalize_hist: true  # 히스토그램 균등화 여부
+  hist_exps: [0, 1, 2]  # W_EXP 리스트 중 시각화할 인덱스
+  equalize_hist: false  # 히스토그램 균등화 여부
 
   show_proj: true       # 프로젝션 비교 시각화 여부
   proj_axes: [0,1,2]    # 프로젝션 축 목록
