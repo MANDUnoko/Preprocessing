@@ -161,25 +161,40 @@ for case_id in case_ids:
                 plt.tight_layout()
                 plt.show()
 
-    # --- 7.6 히스토그램 분석 섹션 ---
+        # --- 7.6 히스토그램 분석 섹션 ---
     if SHOW_HIST:
-        # 1) 원본 볼륨 히스토그램
-        plt.figure()
-        plt.hist(vol_r.ravel(), bins=HIST_BINS, alpha=0.5, label="Original")
-        # 2) 전처리 채널별 히스토그램
-        for idx in HIST_EXPS:
-            ch = volume_channels[idx]
-            plt.hist(ch.ravel(), bins=HIST_BINS, alpha=0.5,
-                     label=f"Preproc W_EXP[{idx}]")
-            if EQUALIZE_HIST:
-                from skimage.exposure import equalize_hist
-                eq = equalize_hist(ch)
-                plt.hist(eq.ravel(), bins=HIST_BINS, alpha=0.3,
-                         label=f"Equalized[{idx}]")
-        plt.legend()
-        plt.title(f"Case {case_id} Histogram")
+        # 1) 원본 볼륨도 같은 윈도우+정규화 적용해 준비
+        clip_min, clip_max = W_EXP[0]
+        win_orig  = np.clip(vol_r, clip_min, clip_max)
+        norm_orig = normalize_volume(win_orig, clip_min=clip_min, clip_max=clip_max)
+
+        # 2) 두 개 subplot 만들기
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+
+        # 2‑1) raw HU 전체 분포
+        ax1.hist(vol_r.ravel(), bins=HIST_BINS, color='gray', alpha=0.7, label='Original HU')
+        ax1.set_xlim(-1000, 3000)
+        ax1.set_title("Raw HU Histogram")
+        ax1.set_xlabel("HU")
+        ax1.set_ylabel("Count")
+        ax1.legend()
+
+        # 2‑2) 정규화된 채널 분포
+        #    - volume_channels 에 담긴 각 실험 채널(0~1)
+        for idx, ch in enumerate(volume_channels):
+            ax2.hist(ch.ravel(), bins=HIST_BINS, alpha=0.5, label=f"W_EXP[{idx}]")
+        #    - 원본 윈도우+정규화 분포도 오버레이
+        ax2.hist(norm_orig.ravel(), bins=HIST_BINS, histtype='step', linewidth=2,
+                 color='black', label="Orig clipped+norm")
+        ax2.set_xlim(0, 1)
+        ax2.set_title("Normalized Histogram")
+        ax2.set_xlabel("Normalized Intensity")
+        ax2.set_ylabel("Count")
+        ax2.legend()
+
+        plt.tight_layout()
         plt.show()
-           
+        
     # ============================================
     # 8. .pt 저장
     # ============================================
