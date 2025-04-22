@@ -1,4 +1,5 @@
-STROKESEGMENTATION/
+```
+PREPROCESSING/
 ├── configs/
 │   └── preprocessing.yaml       # 파라미터 일괄 관리
 │
@@ -14,7 +15,7 @@ STROKESEGMENTATION/
 │   └── preprocess.py            # 전체 3D 전처리 + projection 생성 → .pt 저장
 └── notebooks/
     └── 02_preprocessing_compare.ipynb  # slice 실험용
-
+```
 실험 계획
 1. Slice 실험 (notebook)
 병변 slice만 골라서 2D 전처리 비교 → parameter 튜닝
