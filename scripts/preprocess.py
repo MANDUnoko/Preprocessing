@@ -10,7 +10,10 @@ from pathlib import Path
 from preprocessing.utils          import load_nifti_as_array, get_spacing_from_affine
 from preprocessing.resample_utils import resample_volume, resample_mask
 from preprocessing.skullstrip     import apply_brain_mask
-from preprocessing.windowing      import apply_window, normalize_volume
+from preprocessing.windowing import (
+    apply_window, normalize_volume,
+    apply_clahe, apply_gamma
+)
 from preprocessing.shape_utils    import to_standard_axis, pad_or_crop_3d, center_crop_3d
 from preprocessing.volume_utils   import mip_projection, aip_projection, mid_plane
 
@@ -39,6 +42,14 @@ tgt_sp  = tuple(cfg["spacings"]["target"])
 
 # window 설정 (WL, WW 값은 중앙/폭으로 계산)
 W_EXP    = cfg["window"]["experiments"]   # e.g. [[0,80],[0,200]]
+enh_cfg = cfg.get("enhancements", {})
+CLAHE_EN   = enh_cfg.get("clahe", {}).get("enable", False)
+CLIP_LIM   = enh_cfg.get("clahe", {}).get("clip_limit", 0.03)
+TILE_SIZE  = tuple(enh_cfg.get("clahe", {}).get("tile_grid_size", [8,8]))
+
+GAMMA_EN   = enh_cfg.get("gamma", {}).get("enable", False)
+GAMMA_VALS = enh_cfg.get("gamma", {}).get("values", [1.0])
+
 
 # shapes
 VOL_SHAPE   = tuple(cfg["shape"]["volume"])  # (D,H,W)
@@ -94,14 +105,24 @@ for case_id in case_ids:
     # ============================================
     # 5. Window & Normalize (여러 범위 실험)
     # ============================================
-    volume_channels = []  # (C, D, H, W)
+    # 5. Window & Normalize (여러 범위 실험)
+    volume_channels = []
     for clip_min, clip_max in W_EXP:
-        # apply_window 함수가 level, width 필요
         level = (clip_min + clip_max) / 2
-        width = (clip_max - clip_min)
-        windowed = apply_window(vol_s, level=level, width=width)
-        norm = normalize_volume(windowed, clip_min=clip_min, clip_max=clip_max)
-        volume_channels.append(norm)
+        width = clip_max - clip_min
+        win   = apply_window(vol_s, level=level, width=width)
+        norm  = normalize_volume(win, clip_min=clip_min, clip_max=clip_max)
+
+    # ▶ CLAHE 적용
+        if CLAHE_EN:
+            norm = apply_clahe(norm, clip_limit=CLIP_LIM, tile_grid_size=TILE_SIZE)
+
+    # ▶ Gamma 실험: γ 리스트마다 추가 채널
+        if GAMMA_EN:
+            for g in GAMMA_VALS:
+                volume_channels.append(apply_gamma(norm, gamma=g))
+        else:
+            volume_channels.append(norm)
 
     # ============================================
     # 6. Pad / Crop to target volume shape
@@ -203,12 +224,21 @@ for case_id in case_ids:
         "mask":        torch.tensor(mask_all, dtype=torch.float32).unsqueeze(0),
         "projections": torch.tensor(projs, dtype=torch.float32),
         "meta": {
-            "id":      case_id,
-            "spacing": tgt_sp,
-            "win_exp": W_EXP,
-            "axes":    AXES,
-            "methods": METHODS
+            "id":        case_id,
+            "spacing":   tgt_sp,
+            "win_exp":   W_EXP,
+            "axes":      AXES,
+            "methods":   METHODS,
+            "clahe": {
+                "enabled":        CLAHE_EN,
+                "clip_limit":     CLIP_LIM,
+                "tile_grid_size": TILE_SIZE
+            },
+            "gamma": {
+                "enabled": GAMMA_EN,
+                "values":  GAMMA_VALS
+            }
         }
     }, str(out_path))
-
+    
     print(f"[✔] Saved: {case_id}")

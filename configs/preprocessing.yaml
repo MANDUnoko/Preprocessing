@@ -10,6 +10,17 @@ window:
   experiments:
     - [0, 80]
     - [0, 200]
+    - [-50, 250]
+    - [-100, 400]
+
+enhancements:
+  clahe:
+    enable: true            # CLAHE 사용 여부
+    clip_limit: 0.03        # (0.01~0.05 권장)
+    tile_grid_size: [8, 8]  # 슬라이스 당 8×8 타일
+  gamma:
+    enable: true
+    values: [0.8, 1.0, 1.2]  # γ 값 리스트; 1.0 은 원본 그대로
 
 shape:
   volume: [140, 250, 250]
@@ -27,7 +38,7 @@ projections:
 visualization:
   show_hist: true       # 히스토그램 시각화 여부
   hist_bins: 100        # 히스토그램 bin 개수
-  hist_exps: [0, 1]     # W_EXP 리스트 중 시각화할 인덱스
+  hist_exps: [0, 1, 2, 3]     # W_EXP 리스트 중 시각화할 인덱스
   equalize_hist: false  # 히스토그램 균등화 여부
 
   show_proj: true       # 프로젝션 비교 시각화 여부
