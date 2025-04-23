@@ -23,8 +23,8 @@ enhancements:
     values: [0.8, 1.0, 1.2]  # γ 값 리스트; 1.0 은 원본 그대로
 
 shape:
-  volume: [140, 250, 250]
-  slice:  [250, 250]
+  volume: [140, 512, 512]    # 원하는 D, H, W
+  slice:  [512, 512]         # 2D 뷰잉용 해상도
 
 projections:
   axes: [0,1,2]   # Z, Y, X
@@ -43,7 +43,7 @@ visualization:
 
   show_proj: true       # 프로젝션 비교 시각화 여부
   proj_axes: [0,1,2]    # 프로젝션 축 목록
-  proj_methods: [mip, aip, mid]  # 프로젝션 방식
+  proj_methods: [mip]  # 프로젝션 방식
 
 
 
