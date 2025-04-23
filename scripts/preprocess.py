@@ -92,7 +92,7 @@ def preprocess_case(case_id: str, cfg: dict):
     ]
     vol_all  = np.stack(processed_vols, axis=0)
     mask_r = to_standard_axis(mask_r)  # 방향 보정
-    mask_all = pad_or_crop_3d(mask_r, target_shape=VOL_SHAPE, crop_only=True)
+    mask_all = pad_or_crop_3d(mask_r, target_shape=VOL_SHAPE)
 
     # 6) Projections
     SLICE_SHAPE = tuple(cfg["shape"]["slice"])
