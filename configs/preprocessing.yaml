@@ -18,9 +18,9 @@ window:
 # 추가 Contrast 보정 기법
 enhancements:
   clahe:
-    enable:        true      # CLAHE 적용 여부
-    clip_limit:    0.03      # 과증폭 방지 임계치 (0.01~0.05 권장)
-    tile_grid_size:[8, 8]    # 2D 슬라이스를 8×8 타일로 분할
+    enable:         true      # CLAHE 적용 여부
+    clip_limit:     0.03      # 과증폭 방지 임계치 (0.01~0.05 권장)
+    tile_grid_size: [8, 8]    # 2D 슬라이스를 8×8 타일로 분할
   gamma:
     enable:        false     # Gamma 교정 적용 여부
     values:        [1.0]     # 적용할 γ 값 리스트
