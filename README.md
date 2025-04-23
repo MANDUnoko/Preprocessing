@@ -12,9 +12,9 @@ PREPROCESSING/
 │   └── volume_utils.py          # mip_projection, aip_projection, mid_plane
 │
 ├── scripts/
-│   └── preprocess.py            # 전체 3D 전처리 + projection 생성 → .pt 저장
+│   └── preprocess.py            # 전처리 + projection 생성 → .pt 저장
 └── notebooks/
-    └── 02_preprocessing_compare.ipynb  # slice 실험용
+    └── preprocessing.ipynb      # 코랩기반 실험용
 ```
 전체 3D 볼륨을 기반으로 한 SNR/CNR 지표는 충분히 괜찮게 나옴
 
