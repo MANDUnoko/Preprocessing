@@ -46,7 +46,10 @@ def preprocess_case(case_id: str, cfg: dict):
 
     # 3) Skull strip
     vol_s = apply_brain_mask(vol_r, brainm_r)
+    vol_s = to_standard_axis(vol_s)  # 방향 정렬 
+
     # vol_s = center_crop_3d(vol_s, crop_shape=VOL_SHAPE)  # 필요 시 사용
+    
     print("원본 HU 범위:", vol.min(), vol.max())
     print("Resampled 후 HU 범위:", vol_r.min(), vol_r.max())
     print("Skullstrip 후 HU 범위:", vol_s.min(), vol_s.max())
@@ -86,6 +89,7 @@ def preprocess_case(case_id: str, cfg: dict):
         for chan in volume_channels
     ]
     vol_all  = np.stack(processed_vols, axis=0)
+    mask_r = to_standard_axis(mask_r)  # 방향 보정
     mask_all = pad_or_crop_3d(mask_r, target_shape=VOL_SHAPE)
 
     # 6) Projections
