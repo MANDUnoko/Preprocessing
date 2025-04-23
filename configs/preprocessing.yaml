@@ -36,6 +36,9 @@ shape:
   volume: [140, 250, 250]  # D 140, H 250px, W 250px
   slice:  [250, 250]       # 2D 프로젝션/시각화 시 (H,W)
 
+# cropping:
+mode: center    # crop_only | center | pad (default)
+
 # 2D Projection 생성 설정
 projections:
   axes:    [0, 1, 2]       # 0=Axial(Z),1=Coronal(Y),2=Sagittal(X)
