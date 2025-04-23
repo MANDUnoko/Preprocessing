@@ -7,12 +7,13 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 import argparse
 
+
 # preprocessing modules
 from preprocessing.utils          import load_nifti_as_array, get_spacing_from_affine
 from preprocessing.resample_utils import resample_volume, resample_mask
 from preprocessing.skullstrip     import apply_brain_mask
 from preprocessing.windowing      import apply_window, normalize_volume, apply_clahe, apply_gamma
-from preprocessing.shape_utils    import to_standard_axis, pad_or_crop_3d, center_crop_3d
+from preprocessing.shape_utils    import to_standard_axis, pad_or_crop_3d
 from preprocessing.volume_utils   import mip_projection, aip_projection, mid_plane
 
 # --- Projection function map ---
@@ -43,19 +44,12 @@ def preprocess_case(case_id: str, cfg: dict):
     mask_r   = resample_mask(mask,     original_spacing=orig_sp, target_spacing=tgt_sp)
     brainm_r = resample_mask(brainm,   original_spacing=orig_sp, target_spacing=tgt_sp)
 
-    # 3) Skull strip + optional crop method
+    # 3) Skull strip
     vol_s = apply_brain_mask(vol_r, brainm_r)
-    vol_s = to_standard_axis(vol_s)
+    vol_s = to_standard_axis(vol_s)  # 방향 정렬 
 
-    crop_mode = cfg.get("cropping", {}).get("mode", "pad")  # pad | crop_only | center
-    VOL_SHAPE = tuple(cfg["shape"]["volume"])
-    if crop_mode == "crop_only":
-        vol_s = pad_or_crop_3d(vol_s, target_shape=VOL_SHAPE, crop_only=True)
-    elif crop_mode == "center":
-        vol_s = center_crop_3d(vol_s, crop_shape=VOL_SHAPE)
-    else:
-        vol_s = pad_or_crop_3d(vol_s, target_shape=VOL_SHAPE)
-
+    # vol_s = center_crop_3d(vol_s, crop_shape=VOL_SHAPE)  # 필요 시 사용
+    
     print("원본 HU 범위:", vol.min(), vol.max())
     print("Resampled 후 HU 범위:", vol_r.min(), vol_r.max())
     print("Skullstrip 후 HU 범위:", vol_s.min(), vol_s.max())
@@ -72,31 +66,33 @@ def preprocess_case(case_id: str, cfg: dict):
 
     volume_channels = []
     for clip_min, clip_max in W_EXP:
+        # window + normalize
         level = (clip_min + clip_max) / 2
         width = clip_max - clip_min
         win  = apply_window(vol_s, level=level, width=width)
         norm = normalize_volume(win, clip_min=clip_min, clip_max=clip_max)
+        # CLAHE
         if clahe_en:
             norm = apply_clahe(norm, clip_limit=clip_lim, tile_grid_size=tile_sz)
+        # Gamma
         if gamma_en:
             for γ in gamma_vs:
                 volume_channels.append(apply_gamma(norm, gamma=γ))
         else:
             volume_channels.append(norm)
-
+            
     for i, ch in enumerate(volume_channels):
         print(f"volume_channels[{i}] mean/std: {ch.mean():.6f} {ch.std():.6f}")
 
-    processed_vols = volume_channels  # 이미 shape 통일됨 or crop된 상태
+    # 5) Pad/crop to volume shape
+    VOL_SHAPE = tuple(cfg["shape"]["volume"])
+    processed_vols = [
+        pad_or_crop_3d(chan, target_shape=VOL_SHAPE)
+        for chan in volume_channels
+    ]
     vol_all  = np.stack(processed_vols, axis=0)
-    mask_r = to_standard_axis(mask_r)
-
-    if crop_mode == "crop_only":
-        mask_all = pad_or_crop_3d(mask_r, target_shape=VOL_SHAPE, crop_only=True)
-    elif crop_mode == "center":
-        mask_all = center_crop_3d(mask_r, crop_shape=VOL_SHAPE)
-    else:
-        mask_all = pad_or_crop_3d(mask_r, target_shape=VOL_SHAPE)
+    mask_r = to_standard_axis(mask_r)  # 방향 보정
+    mask_all = pad_or_crop_3d(mask_r, target_shape=VOL_SHAPE, crop_only=True)
 
     # 6) Projections
     SLICE_SHAPE = tuple(cfg["shape"]["slice"])
@@ -106,9 +102,11 @@ def preprocess_case(case_id: str, cfg: dict):
     for axis in AXES:
         for method in METHODS:
             proj = PROJ_FNS[method](vol_s, axis=axis)
+            # ensure (H,W)
             h, w = proj.shape
             if h < w:
                 proj = proj.T
+            # window/normalize first experiment
             clip0 = W_EXP[0]
             level = (clip0[0]+clip0[1])/2
             width = clip0[1]-clip0[0]
@@ -120,6 +118,7 @@ def preprocess_case(case_id: str, cfg: dict):
             projs.append(proj)
     projs = np.stack(projs, axis=0)
 
+    # 7) Save .pt
     torch.save({
         "volume":      torch.tensor(vol_all, dtype=torch.float32),
         "mask":        torch.tensor(mask_all, dtype=torch.float32).unsqueeze(0),
@@ -226,4 +225,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
