@@ -47,6 +47,10 @@ def preprocess_case(case_id: str, cfg: dict):
     # 3) Skull strip
     vol_s = apply_brain_mask(vol_r, brainm_r)
     # vol_s = center_crop_3d(vol_s, crop_shape=VOL_SHAPE)  # 필요 시 사용
+    print("원본 HU 범위:", vol.min(), vol.max())
+    print("Resampled 후 HU 범위:", vol_r.min(), vol_r.max())
+    print("Skullstrip 후 HU 범위:", vol_s.min(), vol_s.max())
+    print("Mask sum:", mask.sum(), "Brain mask sum:", brainm.sum())
 
     # 4) Window / normalize / enhancements → channels
     W_EXP    = cfg["window"]["experiments"]
@@ -73,6 +77,7 @@ def preprocess_case(case_id: str, cfg: dict):
                 volume_channels.append(apply_gamma(norm, gamma=γ))
         else:
             volume_channels.append(norm)
+        print("volume_channels[0] mean/std:", volume_channels[0].mean(), volume_channels[0].std())
 
     # 5) Pad/crop to volume shape
     VOL_SHAPE = tuple(cfg["shape"]["volume"])
@@ -168,13 +173,6 @@ def visualize_case(case_id: str, cfg: dict):
                 ax.axis("off")
             plt.tight_layout(), plt.show()
 
-
-
-
-import os
-import yaml
-import argparse
-from pathlib import Path
 
 def main():
     parser = argparse.ArgumentParser(

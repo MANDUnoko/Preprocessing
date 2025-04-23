@@ -2,7 +2,9 @@
 python scripts/preprocess.py --all
 
 코랩
-!python scripts/preprocess.py --data_dir /content/drive/MyDrive/project/data --cases 049
-
+%run scripts/preprocess.py \
+  --data_dir "/content/drive/MyDrive/Daejeon_Medcoding(2024-12~2025-07)/이미지 프로젝트/2차 시도/data" \
+  --cases 049
+  
 ** --all 만 주면 data_dir/raw/ 폴더에 있는 모든 .nii* 파일을 처리
 ** --cases 049 052 처럼 --cases 뒤에 케이스 ID(확장자 없는 숫자)만 나열하면 해당 케이스들만 처리
