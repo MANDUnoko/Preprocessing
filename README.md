@@ -22,3 +22,7 @@ PREPROCESSING/
 학습 시 patch sampling을 병변 위주로 조절하거나
 3D augment(회전·스케일·좌우반전)를 적용
 모델 입력으로 다채널 윈도우(+CLAHE, Gamma) 조합을 시험 등...
+
+그리고 nii -> 전처리 -> nii
+에서 post nii 를 뷰어로 보면 모양이 찌그러지는 문제 발생
+어케 해결해야할지 모르겠음.. 패딩 문제인지
