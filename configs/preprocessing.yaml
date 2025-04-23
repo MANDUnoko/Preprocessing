@@ -1,49 +1,49 @@
+# 기본 데이터 경로
 data_dir: "data"
 
+# Voxel spacing (z, y, x) — 원본 스캔 vs 목표 isotropic
 spacings:
-  original: [5.0, 0.4121, 0.4121]
-  target:   [1.0, 1.0, 1.0]
+  original: [5.0, 0.4121, 0.4121]  # 원본 CT의 Z/Y/X 해상도 [mm]
+  target:   [1.0, 1.0, 1.0]        # 모두 1mm로 맞춰 재샘플링
 
+# 실험할 Window 범위 목록 (clip_min, clip_max)
 window:
-  level: 40
-  width: 80
   experiments:
-    - [0, 80]
-    - [0, 200]
-    - [-50, 250]
-    - [-100, 400]
+    - [0,    80]   # 기본 soft-tissue 강조 (WL=40, WW=80)
+    - [0,   200]   # bone 포함
+    - [-50, 250]   # subarachnoid 대비
+    - [-100,400]   # 넓은 HU 스펙트럼
+# 전처리 결과물(.pt)에는 모든 실험 채널이 쌓이고, 시각화나 모델 학습 시에는 experiments 중 원하는 채널을 선택
 
+# 추가 Contrast 보정 기법
 enhancements:
   clahe:
-    enable: true            # CLAHE 사용 여부
-    clip_limit: 0.03        # (0.01~0.05 권장)
-    tile_grid_size: [8, 8]  # 슬라이스 당 8×8 타일
+    enable:        true      # CLAHE 적용 여부
+    clip_limit:    0.03      # 과증폭 방지 임계치 (0.01~0.05 권장)
+    tile_grid_size:[8, 8]    # 2D 슬라이스를 8×8 타일로 분할
   gamma:
-    enable: true
-    values: [0.8, 1.0, 1.2]  # γ 값 리스트; 1.0 은 원본 그대로
+    enable:        false     # Gamma 교정 적용 여부
+    values:        [1.0]     # 적용할 γ 값 리스트
 
+# 전처리된 3D 볼륨 크기 (D, H, W)
 shape:
-  volume: [140, 512, 512]    # 원하는 D, H, W
-  slice:  [512, 512]         # 2D 뷰잉용 해상도
+  volume: [140, 250, 250]  # D 140, H 250px, W 250px
+  slice:  [250, 250]       # 2D 프로젝션/시각화 시 (H,W)
 
+# 2D Projection 생성 설정
 projections:
-  axes: [0,1,2]   # Z, Y, X
-  methods: [mip, aip, mid]
+  axes:    [0, 1, 2]       # 0=Axial(Z),1=Coronal(Y),2=Sagittal(X)
+  methods: [mip, aip, mid] # 최대/평균/중앙 투영
 
-# 히스토그램 시각화 옵션
-# SHOW_HIST: 볼륨 값 분포를 시각화할지 여부
-# HIST_BINS: 히스토그램의 막대 수
-# HIST_EXPS: W_EXP 리스트 중 어떤 실험 채널을 분석할지 지정
-# EQUALIZE_HIST: True 시, 히스토그램 균등화(equalization) 후 원본 vs 균등화된 분포 비교
+# 시각화 옵션 (주피터나 스크립트에서 사용할 UI)
 visualization:
-  show_hist: true       # 히스토그램 시각화 여부
-  hist_bins: 100        # 히스토그램 bin 개수
-  hist_exps: [0, 1, 2, 3]     # W_EXP 리스트 중 시각화할 인덱스
-  equalize_hist: false  # 히스토그램 균등화 여부
+  show_hist:     true      # 히스토그램 출력 여부
+  hist_bins:     100       # 히스토그램 bin 개수
+  hist_exps:     [0]       # experiments 중 어느 인덱스 채널을 그릴지
+  show_slice:    true      # 단일 슬라이스 비교 출력 여부
+  slice_axes:    [0]       # 슬라이스를 뽑을 축 (0=Axial)
+  slice_indices: [70]      # 각 축별 사용할 슬라이스 인덱스
 
-  show_proj: true       # 프로젝션 비교 시각화 여부
-  proj_axes: [0,1,2]    # 프로젝션 축 목록
-  proj_methods: [mip]  # 프로젝션 방식
 
 
 
