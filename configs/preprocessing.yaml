@@ -16,6 +16,8 @@ spacings:
 window:
   experiments:
   - [20, 80]
+  - [0, 100]
+  - [-20, 100]
 # 전처리 결과물(.pt)에는 모든 실험 채널이 쌓이고, 시각화나 모델 학습 시에는 experiments 중 원하는 채널을 선택
 
 # 추가 Contrast 보정 기법
