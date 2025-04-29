@@ -171,7 +171,8 @@ def visualize_case(case_id: str, cfg: dict):
         indices= cfg["visualization"]["slice_indices"] or [vol0.shape[a]//2 for a in axes]
         for axis, idx in zip(axes, indices):
             orig = np.take(vol0, idx, axis=axis)
-            proc = np.take(vol_all[2], idx, axis=axis)
+            proc_ch_idx = cfg["visualization"].get("slice_proc_channel", 1)
+            proc = np.take(vol_all[proc_ch_idx], idx, axis=axis)
             fig, axs = plt.subplots(1,2,figsize=(8,4))
             for ax,img,title in zip(axs, [orig,proc], ["Original","Preproc"]):
                 ax.imshow(img, cmap="gray", aspect="equal", origin="lower")
