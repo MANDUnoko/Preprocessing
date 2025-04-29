@@ -10,7 +10,7 @@ extensions:
 # Voxel spacing (z, y, x) — 원본 스캔 vs 목표 isotropic
 spacings:
   original: [5.0, 0.4121, 0.4121]  # 원본 CT의 Z/Y/X 해상도 [mm]
-  target: [5.0, 1, 1]           # 모두 1mm로 맞춰 재샘플링
+  target:   [5.0, 1.0, 1.0]           # 재샘플링
 
 # 실험할 Window 범위 목록 (clip_min, clip_max)
 window:
