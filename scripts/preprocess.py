@@ -33,9 +33,9 @@ def preprocess_case(case_id: str, cfg: dict):
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     # 1) Load + reorient
-    vol, affine = load_nifti_as_array(str(raw_path), reorient=True)
-    mask, _     = load_nifti_as_array(str(mask_path), reorient=True)
-    brainm, _   = load_nifti_as_array(str(brainm_path), reorient=True)
+    vol, affine = load_nifti_as_array(str(raw_path), reorient=False)
+    mask, _     = load_nifti_as_array(str(mask_path), reorient=False)
+    brainm, _   = load_nifti_as_array(str(brainm_path), reorient=False)
 
     # 2) Resample to isotropic
     orig_sp = tuple(cfg["spacings"]["original"])
@@ -147,7 +147,7 @@ def visualize_case(case_id: str, cfg: dict):
     data_dir  = Path(os.environ.get("DATA_DIR", cfg["data_dir"]))
     pt_path   = data_dir / "processed" / f"{case_id}.pt"
     data      = torch.load(pt_path)
-    vol_all   = data["volume"].numpy()    # (C,D,H,W)
+    vol_all   = data["volume"].numpy()    # (D,H,W)
     vol0      = vol_all[0]                # first channel
     mask_all  = data["mask"].numpy()[0]   # (D,H,W)
     W_EXP     = cfg["window"]["experiments"]
@@ -171,13 +171,24 @@ def visualize_case(case_id: str, cfg: dict):
         indices= cfg["visualization"]["slice_indices"] or [vol0.shape[a]//2 for a in axes]
         for axis, idx in zip(axes, indices):
             orig = np.take(vol0, idx, axis=axis)
-            proc = np.take(vol0, idx, axis=axis)  # or other channel
+            proc = np.take(vol_all[1], idx, axis=axis)
             fig, axs = plt.subplots(1,2,figsize=(8,4))
             for ax,img,title in zip(axs, [orig,proc], ["Original","Preproc"]):
                 ax.imshow(img, cmap="gray", aspect="equal", origin="lower")
                 ax.set_title(f"{title} axis={axis}, idx={idx}")
                 ax.axis("off")
             plt.tight_layout(), plt.show()
+    
+    if cfg["visualization"]["show_mip"]:
+        axes = cfg["visualization"]["mip_axes"]
+        for axis in axes:
+            mip_orig = np.max(vol0, axis=axis)
+            fig, ax = plt.subplots(1, 1, figsize=(5,5))
+            ax.imshow(mip_orig, cmap="gray", aspect="equal", origin="lower")
+            ax.set_title(f"MIP axis={axis}")
+            ax.axis("off")
+            plt.tight_layout(), plt.show()
+
 
 
 def main():

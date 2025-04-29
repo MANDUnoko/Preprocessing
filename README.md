@@ -12,20 +12,17 @@ PREPROCESSING/
 │   └── volume_utils.py          # mip_projection, aip_projection, mid_plane
 │
 ├── scripts/
-│   └── preprocess.py            # 전체 3D 전처리 + projection 생성 → .pt 저장
+│   └── preprocess.py            # 전처리 + projection 생성 → .pt 저장
 └── notebooks/
-    └── 02_preprocessing_compare.ipynb  # slice 실험용
+    └── preprocessing.ipynb      # 코랩기반 실험용
 ```
-실험 계획
-1. Slice 실험 (notebook)
-병변 slice만 골라서 2D 전처리 비교 → parameter 튜닝
+전체 3D 볼륨을 기반으로 한 SNR/CNR 지표는 충분히 괜찮게 나옴
 
-2. 5D 프로토타입
-원본 중앙슬라이스±1 + Z‑MIP 1 채널 등 5채널 입력, 2D U‑Net 실험
+다만 데이터 불균형(lesion 픽셀이 매우 적음)을 완화하기 위해
+학습 시 patch sampling을 병변 위주로 조절하거나
+3D augment(회전·스케일·좌우반전)를 적용
+모델 입력으로 다채널 윈도우(+CLAHE, Gamma) 조합을 시험 등...
 
-3. 3D 모델 학습
-최종 .pt로 ResUNet3D / SwinUNETR
-실험군: window [0–80] vs [0–200], skull strip vs center crop vs 둘 다
-
-4. 평가 지표
-Dice, IoU, HD, CNR, SNR, 학습 속도(epochs to converge)
+그리고 nii -> 전처리 -> nii
+에서 post nii 를 뷰어로 보면 모양이 찌그러지는 문제 발생
+어케 해결해야할지 모르겠음.. 패딩 문제인지
