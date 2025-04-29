@@ -176,7 +176,7 @@ def visualize_case(case_id: str, cfg: dict):
             proc = np.take(vol_all[proc_ch_idx], idx, axis=axis)
             fig, axs = plt.subplots(1,2,figsize=(8,4))
             for ax,img,title in zip(axs, [orig,proc], ["Original","Preproc"]):
-                ax.imshow(img, cmap="gray", aspect="equal", origin="lower")
+                ax.imshow(img, cmap="gray", aspect="auto", origin="lower")
                 ax.set_title(f"{title} axis={axis}, idx={idx}")
                 ax.axis("off")
             plt.tight_layout(), plt.show()
