@@ -61,6 +61,9 @@ def preprocess_case(case_id: str, cfg: dict):
 
     # 방향 정렬
     vol_s = to_standard_axis(vol_s)
+    
+    print("[DEBUG] vol_s 통계")
+    print(f"  min: {vol_s.min()}, max: {vol_s.max()}, mean: {vol_s.mean()}")
 
     # vol_s = center_crop_3d(vol_s, crop_shape=VOL_SHAPE)  # 필요 시 사용
     
