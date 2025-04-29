@@ -15,7 +15,7 @@ spacings:
 # 실험할 Window 범위 목록 (clip_min, clip_max)
 window:
   experiments:
-    - [30, 90]   
+    - [50, 120]   
     - [0, 80]   
     - [-50, 150]
 
