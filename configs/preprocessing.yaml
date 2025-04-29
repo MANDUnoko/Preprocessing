@@ -48,7 +48,7 @@ visualization:
   slice_indices: [16]      # 각 축별 사용할 슬라이스 인덱스
   "show_mip": True
   "mip_axes": [0, 1, 2]
-  slice_proc_channel: 0 # experiments 중 어느 인덱스 채널을 그릴지
+  slice_proc_channel: 2 # experiments 중 어느 인덱스 채널을 그릴지
 
 
 
