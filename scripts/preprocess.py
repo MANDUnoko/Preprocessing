@@ -6,6 +6,7 @@ import nibabel as nib
 import matplotlib.pyplot as plt
 from pathlib import Path
 import argparse
+from scipy.ndimage import binary_erosion
 
 
 # preprocessing modules
@@ -45,8 +46,14 @@ def preprocess_case(case_id: str, cfg: dict):
     brainm_r = resample_mask(brainm,   original_spacing=orig_sp, target_spacing=tgt_sp)
 
     # 3) Skull strip
-    vol_s = apply_brain_mask(vol_r, brainm_r)
-    vol_s = to_standard_axis(vol_s)  # 방향 정렬 
+    # ① brain_mask 리샘플
+    brainm_r = resample_mask(brainm, original_spacing=orig_sp, target_spacing=tgt_sp)
+    # ② erosion 적용 (필요하면)
+    brainm_eroded = binary_erosion(brainm_r, iterations=1)  # or iterations=0으로 끌 수도 있음
+    # ③ Skull strip
+    vol_s = apply_brain_mask(vol_r, brainm_eroded)
+    # ④ 방향 정렬
+    vol_s = to_standard_axis(vol_s)
 
     # vol_s = center_crop_3d(vol_s, crop_shape=VOL_SHAPE)  # 필요 시 사용
     
