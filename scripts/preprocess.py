@@ -102,36 +102,15 @@ def preprocess_case(case_id: str, cfg: dict):
         print(f"volume_channels[{i}] mean/std: {ch.mean():.6f} {ch.std():.6f}")
 
     # 5) Pad/crop to volume shape
-    TARGET_VOL_SHAPE = tuple(cfg["shape"]["volume"])  # (140,250,250)
-
-    processed_vols = []
-    for chan in volume_channels:
-        # 현재 볼륨 z축 크기
-        current_z = chan.shape[0]
+    VOL_SHAPE = tuple(cfg["shape"]["volume"])
+    processed_vols = [
+        pad_to_shape(chan, target_shape=VOL_SHAPE, mode="reflect")
+        for chan in volume_channels
+    ]
+    vol_all  = np.stack(processed_vols, axis=0)
     
-        if current_z < TARGET_VOL_SHAPE[0]:
-            # Z축은 현재 크기로 두고 (D,H,W) → (현재D, 250, 250)
-            new_shape = (current_z, TARGET_VOL_SHAPE[1], TARGET_VOL_SHAPE[2])
-        else:
-            # 충분히 크면 140으로 맞춤
-            new_shape = TARGET_VOL_SHAPE
-
-        processed_vols.append(
-            pad_to_shape(chan, target_shape=new_shape, mode="reflect")
-        )
-
-    vol_all = np.stack(processed_vols, axis=0)
-
-    # 마스크도 동일하게 처리
-    mask_r = to_standard_axis(mask_r)
-
-    current_z_mask = mask_r.shape[0]
-    if current_z_mask < TARGET_VOL_SHAPE[0]:
-        mask_shape = (current_z_mask, TARGET_VOL_SHAPE[1], TARGET_VOL_SHAPE[2])
-    else:
-        mask_shape = TARGET_VOL_SHAPE
-
-    mask_all = pad_to_shape(mask_r, target_shape=mask_shape, mode="reflect")
+    mask_r = to_standard_axis(mask_r)  # 방향 보정
+    mask_all = pad_to_shape(mask_r, target_shape=VOL_SHAPE, mode="reflect")
 
     # 6) Projections
     SLICE_SHAPE = tuple(cfg["shape"]["slice"])
