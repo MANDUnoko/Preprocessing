@@ -79,8 +79,6 @@ def center_crop_3d(volume, crop_shape=(140, 250, 250)):
         start_w:start_w+cw
     ]
     
-import numpy as np
-
 def pad_to_shape(volume, target_shape, pad_value=0):
     """
     volume을 target_shape까지 패딩만 수행. (crop 없이)
