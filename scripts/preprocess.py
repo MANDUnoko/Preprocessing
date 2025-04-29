@@ -13,7 +13,7 @@ from preprocessing.utils          import load_nifti_as_array, get_spacing_from_a
 from preprocessing.resample_utils import resample_volume, resample_mask
 from preprocessing.skullstrip     import apply_brain_mask
 from preprocessing.windowing      import apply_window, normalize_volume, apply_clahe, apply_gamma
-from preprocessing.shape_utils    import to_standard_axis, pad_or_crop_3d
+from preprocessing.shape_utils    import to_standard_axis, pad_or_crop_3d, pad_to_shape
 from preprocessing.volume_utils   import mip_projection, aip_projection, mid_plane
 
 # --- Projection function map ---
@@ -87,12 +87,12 @@ def preprocess_case(case_id: str, cfg: dict):
     # 5) Pad/crop to volume shape
     VOL_SHAPE = tuple(cfg["shape"]["volume"])
     processed_vols = [
-        pad_or_crop_3d(chan, target_shape=VOL_SHAPE)
+        pad_to_shape(chan, target_shape=VOL_SHAPE)
         for chan in volume_channels
     ]
     vol_all  = np.stack(processed_vols, axis=0)
     mask_r = to_standard_axis(mask_r)  # 방향 보정
-    mask_all = pad_or_crop_3d(mask_r, target_shape=VOL_SHAPE)
+    mask_all = pad_to_shape(mask_r, target_shape=VOL_SHAPE)
 
     # 6) Projections
     SLICE_SHAPE = tuple(cfg["shape"]["slice"])
