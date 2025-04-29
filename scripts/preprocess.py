@@ -145,52 +145,39 @@ def preprocess_case(case_id: str, cfg: dict):
 
 
 def visualize_case(case_id: str, cfg: dict):
-    data_dir  = Path(os.environ.get("DATA_DIR", cfg["data_dir"]))
-    pt_path   = data_dir / "processed" / f"{case_id}.pt"
-    data      = torch.load(pt_path)
-    vol_all   = data["volume"].numpy()    # (D,H,W)
-    vol0      = vol_all[0]                # first channel
-    mask_all  = data["mask"].numpy()[0]   # (D,H,W)
-    W_EXP     = cfg["window"]["experiments"]
+    data_dir = Path(os.environ.get("DATA_DIR", cfg["data_dir"]))
+    pt_path  = data_dir / "processed" / f"{case_id}.pt"
+    data     = torch.load(pt_path)
+    
+    vol_all  = data["volume"].numpy()     # (C, D, H, W)
+    mask_all = data["mask"].numpy()[0]    # (D, H, W)
+    proc_vol = vol_all                    # 전처리된 다채널
+    W_EXP    = cfg["window"]["experiments"]
 
-    # histogram
-    if cfg["visualization"]["show_hist"]:
-        bins = cfg["visualization"]["hist_bins"]
-        exps = cfg["visualization"]["hist_exps"]
-        fig, (ax1, ax2) = plt.subplots(1,2,figsize=(12,4))
-        ax1.hist(vol0.ravel(), bins=bins, color="gray", alpha=0.7)
-        ax1.set_title("Normalized Channel Histogram")
-        for idx in exps:
-            ch = vol_all[idx]
-            ax2.hist(ch.ravel(), bins=bins, alpha=0.5, label=f"W_EXP[{idx}]")
-        ax2.legend(), ax2.set_title("Multiple Window Experiments")
-        plt.show()
+    # 원본 CT 불러오기 (.nii.gz)
+    raw_path = data_dir / "raw" / f"{case_id}{cfg['extensions']['raw']}"
+    raw_vol, _ = load_nifti_as_array(str(raw_path), reorient=False)
+
+    # 방향 맞추기 + shape 맞추기
+    raw_vol = to_standard_axis(raw_vol)  # (D, H, W)
+    raw_vol = pad_to_shape(raw_vol, target_shape=vol_all.shape[1:], mode="reflect")
 
     # slice compare
     if cfg["visualization"]["show_slice"]:
-        axes   = cfg["visualization"]["slice_axes"]
-        indices= cfg["visualization"]["slice_indices"] or [vol0.shape[a]//2 for a in axes]
+        axes    = cfg["visualization"]["slice_axes"]
+        indices = cfg["visualization"]["slice_indices"] or [raw_vol.shape[a] // 2 for a in axes]
+        proc_ch_idx = cfg["visualization"].get("slice_proc_channel", 0)
+
         for axis, idx in zip(axes, indices):
-            orig = np.take(vol0, idx, axis=axis)
-            proc_ch_idx = cfg["visualization"].get("slice_proc_channel", 1)
-            proc = np.take(vol_all[proc_ch_idx], idx, axis=axis)
-            fig, axs = plt.subplots(1,2,figsize=(8,4))
-            for ax,img,title in zip(axs, [orig,proc], ["Original","Preproc"]):
+            orig = np.take(raw_vol, idx, axis=axis)
+            proc = np.take(proc_vol[proc_ch_idx], idx, axis=axis)
+
+            fig, axs = plt.subplots(1, 2, figsize=(8, 4))
+            for ax, img, title in zip(axs, [orig, proc], ["Original", "Preproc"]):
                 ax.imshow(img, cmap="gray", aspect="auto", origin="lower")
                 ax.set_title(f"{title} axis={axis}, idx={idx}")
                 ax.axis("off")
             plt.tight_layout(), plt.show()
-    
-    if cfg["visualization"]["show_mip"]:
-        axes = cfg["visualization"]["mip_axes"]
-        for axis in axes:
-            mip_orig = np.max(vol0, axis=axis)
-            fig, ax = plt.subplots(1, 1, figsize=(5,5))
-            ax.imshow(mip_orig, cmap="gray", aspect="auto", origin="lower")
-            ax.set_title(f"MIP axis={axis}")
-            ax.axis("off")
-            plt.tight_layout(), plt.show()
-
 
 
 def main():
