@@ -105,15 +105,16 @@ def preprocess_case(case_id: str, cfg: dict):
         print(f"volume_channels[{i}] mean/std: {ch.mean():.6f} {ch.std():.6f}")
 
     # 5) Pad/crop to volume shape
-    VOL_SHAPE = tuple(cfg["shape"]["volume"])
+    TARGET_VOL_SHAPE = tuple(cfg["shape"]["volume"])
     processed_vols = [
-        pad_to_shape(chan, target_shape=VOL_SHAPE, mode="reflect")
+        pad_or_crop_3d(chan, target_shape=TARGET_VOL_SHAPE)
         for chan in volume_channels
     ]
-    vol_all  = np.stack(processed_vols, axis=0)
-    
-    mask_r = to_standard_axis(mask_r)  # 방향 보정
-    mask_all = pad_to_shape(mask_r, target_shape=VOL_SHAPE, mode="reflect")
+    vol_all = np.stack(processed_vols, axis=0)
+
+    # 마스크도 동일하게
+    mask_r = to_standard_axis(mask_r)
+    mask_all = pad_or_crop_3d(mask_r, target_shape=TARGET_VOL_SHAPE)
 
     # 6) Projections
     SLICE_SHAPE = tuple(cfg["shape"]["slice"])
