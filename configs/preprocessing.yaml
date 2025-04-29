@@ -21,6 +21,7 @@ window:
 
 # 추가 Contrast 보정 기법
 enhancements:
+  skull_strip: false
   clahe:
     enable:         true     # CLAHE 적용 여부
     clip_limit:     0.03      # 과증폭 방지 임계치 (0.01~0.05 권장)

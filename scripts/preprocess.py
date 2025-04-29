@@ -46,20 +46,25 @@ def preprocess_case(case_id: str, cfg: dict):
     brainm_r = resample_mask(brainm,   original_spacing=orig_sp, target_spacing=tgt_sp)
 
     # 3) Skull strip
+    use_skull_strip = cfg.get("enhancements", {}).get("skull_strip", True)
     BRAIN_MASK_VALID_THRESHOLD = 10000
     brainm_sum = np.sum(brainm_r)
 
-    if brainm_sum < BRAIN_MASK_VALID_THRESHOLD or np.max(brainm_r) < 1:
-        # 비정상 마스크 (너무 작거나 아예 없음)
-        vol_s = vol_r
-        print(f"Brain mask 비정상 (sum={brainm_sum}), 원본 볼륨 사용")
+    if use_skull_strip:
+        if brainm_sum < BRAIN_MASK_VALID_THRESHOLD or np.max(brainm_r) < 1:
+            vol_s = vol_r
+            print(f"Skull-strip fallback 적용 (mask sum={brainm_sum})")
+        else:
+            vol_s = apply_brain_mask(vol_r, brainm_r)
+            print(f"Skull-strip 적용 (mask sum={brainm_sum})")
     else:
-        vol_s = apply_brain_mask(vol_r, brainm_r)
-        print(f"Skull strip 적용 (mask sum: {brainm_sum})")
+        vol_s = vol_r
+        print("Skull-strip 옵션 비활성화됨 → 원본 볼륨 사용")
 
-    # 방향 정렬
+    # ④ 방향 정렬
     vol_s = to_standard_axis(vol_s)
-    
+
+    # 디버그 출력
     print("[DEBUG] vol_s 통계")
     print(f"  min: {vol_s.min()}, max: {vol_s.max()}, mean: {vol_s.mean()}")
 
