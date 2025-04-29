@@ -15,10 +15,7 @@ spacings:
 # 실험할 Window 범위 목록 (clip_min, clip_max)
 window:
   experiments:
-    - [40, 80]   
-    - [0, 80]   
-    - [-50, 150]
-
+    - [20, 100]
 
 # 전처리 결과물(.pt)에는 모든 실험 채널이 쌓이고, 시각화나 모델 학습 시에는 experiments 중 원하는 채널을 선택
 
