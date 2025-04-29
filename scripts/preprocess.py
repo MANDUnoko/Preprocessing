@@ -63,6 +63,7 @@ def preprocess_case(case_id: str, cfg: dict):
 
     # ④ 방향 정렬
     vol_s = to_standard_axis(vol_s)
+    print(f"[DEBUG] shape after axis standardization: {vol_s.shape}")  # → (D,H,W)
 
     # 디버그 출력
     print("[DEBUG] vol_s 통계")
