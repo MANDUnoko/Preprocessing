@@ -80,10 +80,7 @@ def center_crop_3d(volume, crop_shape=(140, 250, 250)):
     ]
    
     
-def pad_to_shape(volume, target_shape, pad_value=0):
-    """
-    volume을 target_shape까지 패딩만 수행. (crop 없이)
-    """
+def pad_to_shape(volume, target_shape, pad_value=0, mode="constant"):
     current_shape = volume.shape
     pad_width = []
     
@@ -93,7 +90,11 @@ def pad_to_shape(volume, target_shape, pad_value=0):
         pad_after = total_pad - pad_before
         pad_width.append((pad_before, pad_after))
     
-    padded = np.pad(volume, pad_width, mode="reflect", constant_values=pad_value)
+    if mode == "constant":
+        padded = np.pad(volume, pad_width, mode=mode, constant_values=pad_value)
+    else:
+        padded = np.pad(volume, pad_width, mode=mode)
     
     return padded
+
 
