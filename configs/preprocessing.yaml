@@ -32,7 +32,7 @@ enhancements:
 
 # 전처리된 3D 볼륨 크기 (D, H, W)
 shape:
-  volume: [140, 250, 250]  # D 140, H 250px, W 250px
+  volume: [140, 512, 512]  # D 140, H 250px, W 250px
   slice:  [250, 250]       # 2D 프로젝션/시각화 시 (H,W)
 
 # 2D Projection 생성 설정
