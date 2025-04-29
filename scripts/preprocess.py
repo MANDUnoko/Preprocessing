@@ -46,17 +46,8 @@ def preprocess_case(case_id: str, cfg: dict):
     brainm_r = resample_mask(brainm,   original_spacing=orig_sp, target_spacing=tgt_sp)
 
     # 3) Skull strip
-    # ① brain_mask 리샘플
-    brainm_r = resample_mask(brainm, original_spacing=orig_sp, target_spacing=tgt_sp)
-    # ② erosion 적용 (필요하면)
-    brainm_eroded = binary_erosion(brainm_r, iterations=0)  # or iterations=0으로 끌 수도 있음
-    
-    if brainm_eroded.sum() == 0:
-       print("⚠️ erosion 후 마스크가 0이 되어 원본 mask로 대체합니다.")
-       brainm_eroded = brainm_r
-    # ③ Skull strip
-    vol_s = apply_brain_mask(vol_r, brainm_eroded)
-    # ④ 방향 정렬
+    # skullstrip 부분
+    vol_s = apply_brain_mask(vol_r, brainm_r)  # erosion 안 함
     vol_s = to_standard_axis(vol_s)
 
     # vol_s = center_crop_3d(vol_s, crop_shape=VOL_SHAPE)  # 필요 시 사용
