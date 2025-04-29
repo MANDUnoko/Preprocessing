@@ -15,8 +15,8 @@ spacings:
 # 실험할 Window 범위 목록 (clip_min, clip_max)
 window:
   experiments:
-    - [20, 100]   # 뇌실질+출혈 대비
-    - [0, 120]    # 조금 더 넓게 (출혈+bone 경계까지)
+    - [30, 90]   
+    - [0, 80]   
     - [-50, 150]
 
 
