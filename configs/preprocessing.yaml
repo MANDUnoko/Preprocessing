@@ -15,9 +15,10 @@ spacings:
 # 실험할 Window 범위 목록 (clip_min, clip_max)
 window:
   experiments:
-  - [20, 80]
-  - [0, 100]
-  - [-20, 100]
+    - [20, 80]    # WL=50, WW=60  — brain parenchyma 강조
+    - [0, 100]    # WL=50, WW=100 — soft tissue 전체
+    - [-50, 150]  # WL=50, WW=200 — subarachnoid space 대비 포함
+
 # 전처리 결과물(.pt)에는 모든 실험 채널이 쌓이고, 시각화나 모델 학습 시에는 experiments 중 원하는 채널을 선택
 
 # 추가 Contrast 보정 기법
@@ -42,9 +43,6 @@ projections:
 
 # 시각화 옵션 (주피터나 스크립트에서 사용할 UI)
 visualization:
-  show_hist:     true      # 히스토그램 출력 여부
-  hist_bins:     100       # 히스토그램 bin 개수
-  hist_exps:     [0]       # experiments 중 어느 인덱스 채널을 그릴지
   show_slice:    true      # 단일 슬라이스 비교 출력 여부
   slice_axes:    [0]       # 슬라이스를 뽑을 축 (0=Axial)
   slice_indices: [16]      # 각 축별 사용할 슬라이스 인덱스
