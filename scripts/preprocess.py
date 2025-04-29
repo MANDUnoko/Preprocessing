@@ -46,8 +46,20 @@ def preprocess_case(case_id: str, cfg: dict):
     brainm_r = resample_mask(brainm,   original_spacing=orig_sp, target_spacing=tgt_sp)
 
     # 3) Skull strip
-    # skullstrip 부분
-    vol_s = apply_brain_mask(vol_r, brainm_r)  # erosion 안 함
+    BRAIN_MASK_VALID_THRESHOLD = 10000
+
+    brainm_sum = np.sum(brainm_r)
+
+    if brainm_sum > BRAIN_MASK_VALID_THRESHOLD:
+        # 정상 brain mask → skull strip
+        vol_s = apply_brain_mask(vol_r, brainm_r)
+        print(f"Skull strip 적용 (mask sum: {brainm_sum})")
+    else:
+        # brain mask가 망가짐 → 원본 사용
+        vol_s = vol_r
+        print(f"Brain mask 비정상 (sum={brainm_sum}), 원본 볼륨 사용")
+
+    # 방향 정렬
     vol_s = to_standard_axis(vol_s)
 
     # vol_s = center_crop_3d(vol_s, crop_shape=VOL_SHAPE)  # 필요 시 사용
