@@ -10,7 +10,7 @@ extensions:
 # Voxel spacing (z, y, x) — 원본 스캔 vs 목표 isotropic
 spacings:
   original: [5.0, 0.4121, 0.4121]  # 원본 CT의 Z/Y/X 해상도 [mm]
-  target: [5.0, 1.0, 1.0]           # 모두 1mm로 맞춰 재샘플링
+  target: [5.0, 0.5, 0.5]           # 모두 1mm로 맞춰 재샘플링
 
 # 실험할 Window 범위 목록 (clip_min, clip_max)
 window:
@@ -47,7 +47,7 @@ visualization:
   hist_bins:     100       # 히스토그램 bin 개수
   hist_exps:     [0]       # experiments 중 어느 인덱스 채널을 그릴지
   show_slice:    true      # 단일 슬라이스 비교 출력 여부
-  slice_axes:    [0]       # 슬라이스를 뽑을 축 (0=Axial)
+  slice_axes:    [2]       # 슬라이스를 뽑을 축 (0=Axial)
   slice_indices: [70]      # 각 축별 사용할 슬라이스 인덱스
   "show_mip": True
   "mip_axes": [0, 1, 2]
