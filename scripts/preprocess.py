@@ -185,7 +185,7 @@ def visualize_case(case_id: str, cfg: dict):
         for axis in axes:
             mip_orig = np.max(vol0, axis=axis)
             fig, ax = plt.subplots(1, 1, figsize=(5,5))
-            ax.imshow(mip_orig, cmap="gray", aspect="equal", origin="lower")
+            ax.imshow(mip_orig, cmap="gray", aspect="auto", origin="lower")
             ax.set_title(f"MIP axis={axis}")
             ax.axis("off")
             plt.tight_layout(), plt.show()

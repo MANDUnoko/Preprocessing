@@ -78,6 +78,7 @@ def center_crop_3d(volume, crop_shape=(140, 250, 250)):
         start_h:start_h+ch,
         start_w:start_w+cw
     ]
+   
     
 def pad_to_shape(volume, target_shape, pad_value=0):
     """
@@ -92,7 +93,7 @@ def pad_to_shape(volume, target_shape, pad_value=0):
         pad_after = total_pad - pad_before
         pad_width.append((pad_before, pad_after))
     
-    padded = np.pad(volume, pad_width, mode="constant", constant_values=pad_value)
+    padded = np.pad(volume, pad_width, mode="reflect", constant_values=pad_value)
     
     return padded
 
