@@ -47,17 +47,15 @@ def preprocess_case(case_id: str, cfg: dict):
 
     # 3) Skull strip
     BRAIN_MASK_VALID_THRESHOLD = 10000
-
     brainm_sum = np.sum(brainm_r)
 
-    if brainm_sum > BRAIN_MASK_VALID_THRESHOLD:
-        # 정상 brain mask → skull strip
-        vol_s = apply_brain_mask(vol_r, brainm_r)
-        print(f"Skull strip 적용 (mask sum: {brainm_sum})")
-    else:
-        # brain mask가 망가짐 → 원본 사용
+    if brainm_sum < BRAIN_MASK_VALID_THRESHOLD or np.max(brainm_r) < 1:
+        # 비정상 마스크 (너무 작거나 아예 없음)
         vol_s = vol_r
         print(f"Brain mask 비정상 (sum={brainm_sum}), 원본 볼륨 사용")
+    else:
+        vol_s = apply_brain_mask(vol_r, brainm_r)
+        print(f"Skull strip 적용 (mask sum: {brainm_sum})")
 
     # 방향 정렬
     vol_s = to_standard_axis(vol_s)
