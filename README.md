@@ -24,3 +24,5 @@ PREPROCESSING/
 모델 입력으로 다채널 윈도우(+CLAHE, Gamma) 조합을 시험 등...
 
 전처리는 대략 정리됨
+다만 resize 문제 해결 필요함...(좀 찌그러지듯 나옴)
+skull stripping 적용하니 병변이 제거되는 경우가 생겨서 off 해둠
