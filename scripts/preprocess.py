@@ -87,7 +87,7 @@ def preprocess_case(case_id: str, cfg: dict):
     # 5) Pad/crop to volume shape
     VOL_SHAPE = tuple(cfg["shape"]["volume"])
     processed_vols = [
-        pad_to_shape(chan, mode="reflect")
+        pad_to_shape(chan, target_shape=VOL_SHAPE, mode="reflect")
         for chan in volume_channels
     ]
     vol_all  = np.stack(processed_vols, axis=0)
