@@ -43,7 +43,7 @@ projections:
 visualization:
   show_slice:    true      # 단일 슬라이스 비교 출력 여부
   slice_axes:    [0]       # 슬라이스를 뽑을 축 (0=Axial)
-  slice_indices: [70]      # 각 축별 사용할 슬라이스 인덱스
+  slice_indices: [80]      # 각 축별 사용할 슬라이스 인덱스
   "show_mip": True
   "mip_axes": [0, 1, 2]
   slice_proc_channel: 0 # experiments 중 어느 인덱스 채널을 그릴지
