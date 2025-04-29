@@ -15,9 +15,7 @@ spacings:
 # 실험할 Window 범위 목록 (clip_min, clip_max)
 window:
   experiments:
-    - [20, 80]    # WL=50, WW=60  — brain parenchyma 강조
-    - [0, 100]    # WL=50, WW=100 — soft tissue 전체
-    - [-50, 150]  # WL=50, WW=200 — subarachnoid space 대비 포함
+    - [-100,400]
 
 # 전처리 결과물(.pt)에는 모든 실험 채널이 쌓이고, 시각화나 모델 학습 시에는 experiments 중 원하는 채널을 선택
 
@@ -48,7 +46,7 @@ visualization:
   slice_indices: [16]      # 각 축별 사용할 슬라이스 인덱스
   "show_mip": True
   "mip_axes": [0, 1, 2]
-  slice_proc_channel: 2 # experiments 중 어느 인덱스 채널을 그릴지
+  slice_proc_channel: 0 # experiments 중 어느 인덱스 채널을 그릴지
 
 
 
