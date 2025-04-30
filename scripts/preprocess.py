@@ -200,13 +200,16 @@ def visualize_case(case_id: str, cfg: dict):
     if pt_path is None:
         raise FileNotFoundError(f"{case_id}.pt not found in processed/ or processed_bad/")
     
+    data = torch.load(pt_path)
     vol_all  = data["volume"].numpy()     # (C, D, H, W)
     mask_all = data["mask"].numpy()[0]    # (D, H, W)
     proc_vol = vol_all                    # 전처리된 다채널
     W_EXP    = cfg["window"]["experiments"]
 
     # 원본 CT 불러오기 (.nii.gz)
-    raw_path = data_dir / "raw" / f"{case_id}{cfg['extensions']['raw']}"
+    raw_path = next((p for p in (data_dir / "raw").glob(f"{case_id}*")), None)
+    if raw_path is None:
+        raise FileNotFoundError(f"Raw CT file for case {case_id} not found.")
     raw_vol, _ = load_nifti_as_array(str(raw_path), reorient=False)
 
     # 방향 맞추기 + shape 맞추기
