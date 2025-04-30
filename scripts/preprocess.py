@@ -187,6 +187,7 @@ def preprocess_case(case_id: str, cfg: dict):
 
 
 def visualize_case(case_id: str, cfg: dict):
+    case_id = Path(case_id).stem  # 확장자 제거 
     data_dir = Path(os.environ.get("DATA_DIR", cfg["data_dir"]))
 
     # processed와 processed_bad 중 존재하는 파일 우선 사용
@@ -198,7 +199,6 @@ def visualize_case(case_id: str, cfg: dict):
 
     if pt_path is None:
         raise FileNotFoundError(f"{case_id}.pt not found in processed/ or processed_bad/")
-    data     = torch.load(pt_path)
     
     vol_all  = data["volume"].numpy()     # (C, D, H, W)
     mask_all = data["mask"].numpy()[0]    # (D, H, W)
