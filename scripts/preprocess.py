@@ -10,7 +10,7 @@ from scipy.ndimage import binary_erosion
 
 
 # preprocessing modules
-from preprocessing.utils          import load_nifti_as_array, get_spacing_from_affine
+from preprocessing.utils          import load_nifti_as_array, get_spacing_from_affine, compute_signal_quality
 from preprocessing.resample_utils import resample_volume, resample_mask
 from preprocessing.skullstrip     import apply_brain_mask
 from preprocessing.windowing      import apply_window, normalize_volume, apply_clahe, apply_gamma
@@ -143,6 +143,20 @@ def preprocess_case(case_id: str, cfg: dict):
             proj = pad_or_crop_3d(proj[np.newaxis], target_shape=(1,)+SLICE_SHAPE).squeeze(0)
             projs.append(proj)
     projs = np.stack(projs, axis=0)
+    
+    # --- Signal Quality 평가
+    snr, cnr = compute_signal_quality(vol_all[0], mask_all)
+
+    print("[Signal Quality]")
+    print(f"  Lesion voxels:     {np.sum(mask_all > 0)}")
+    print(f"  Background voxels: {np.sum(mask_all == 0)}")
+    print(f"  SNR:  {snr:.4f}  (기준 > 1.0)")
+    print(f"  CNR:  {cnr:.4f}  (기준 > 0.5)")
+
+    # --- 저장 경로 분기
+    out_dir = data_dir / ("processed" if snr > 1.0 and cnr > 0.5 else "processed_bad")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"{case_id}.pt"
 
     # 7) Save .pt
     torch.save({

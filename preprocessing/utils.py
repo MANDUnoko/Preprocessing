@@ -60,3 +60,22 @@ def dicom_to_hu(ds):
     slope = float(ds.get('RescaleSlope', 1.0))
     intercept = float(ds.get('RescaleIntercept', 0.0))
     return image * slope + intercept
+
+def compute_signal_quality(volume: np.ndarray, mask: np.ndarray):
+    """
+    SNR, CNR 계산
+    """
+    lesion_voxels = volume[mask > 0]
+    bg_voxels     = volume[mask == 0]
+
+    if len(lesion_voxels) == 0 or len(bg_voxels) == 0:
+        return 0, 0  # 병변 없음
+
+    lesion_mean = lesion_voxels.mean()
+    bg_mean     = bg_voxels.mean()
+    bg_std      = bg_voxels.std() + 1e-5  # 0 나누기 방지
+
+    snr = lesion_mean / bg_std
+    cnr = abs(lesion_mean - bg_mean) / bg_std
+
+    return snr, cnr
