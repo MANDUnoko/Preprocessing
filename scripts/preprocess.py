@@ -271,8 +271,8 @@ def main():
         case_list = args.cases
         
     # 처리 루프
-    for case_id in case_list:
-        case_id = Path(case_id).stem  # 확장자 제거 (e.g., 124.nii → 124)
+    for case_raw in case_list:
+        case_id = Path(case_raw).stem  # 여기서 확장자 제거!
         print(f"\n>>> Processing case {case_id}")
         preprocess_case(case_id, cfg)
         visualize_case(case_id, cfg)
