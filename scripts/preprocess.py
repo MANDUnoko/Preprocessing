@@ -230,7 +230,6 @@ def visualize_case(case_id: str, cfg: dict):
                 ax.axis("off")
             plt.tight_layout(), plt.show()
 
-
 def main():
     parser = argparse.ArgumentParser(
         description="Preprocess and visualize CT cases."
