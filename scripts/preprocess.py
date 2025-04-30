@@ -121,12 +121,13 @@ def preprocess_case(case_id: str, cfg: dict):
 
     # 6) Projections
     SLICE_SHAPE = tuple(cfg["shape"]["slice"])
+    vol_for_proj = vol_all[0]
     AXES    = cfg["projections"]["axes"]
     METHODS = cfg["projections"]["methods"]
     projs = []
     for axis in AXES:
         for method in METHODS:
-            proj = PROJ_FNS[method](vol_s, axis=axis)
+            proj = PROJ_FNS[method](vol_for_proj, axis=axis)
             # ensure (H,W)
             h, w = proj.shape
             if h < w:
