@@ -188,7 +188,16 @@ def preprocess_case(case_id: str, cfg: dict):
 
 def visualize_case(case_id: str, cfg: dict):
     data_dir = Path(os.environ.get("DATA_DIR", cfg["data_dir"]))
-    pt_path  = data_dir / "processed" / f"{case_id}.pt"
+
+    # processed와 processed_bad 중 존재하는 파일 우선 사용
+    candidates = [
+        data_dir / "processed"     / f"{case_id}.pt",
+        data_dir / "processed_bad" / f"{case_id}.pt",
+    ]
+    pt_path = next((p for p in candidates if p.exists()), None)
+
+    if pt_path is None:
+        raise FileNotFoundError(f"{case_id}.pt not found in processed/ or processed_bad/")
     data     = torch.load(pt_path)
     
     vol_all  = data["volume"].numpy()     # (C, D, H, W)
