@@ -25,6 +25,9 @@ PROJ_FNS = {
 }
 
 def preprocess_case(case_id: str, cfg: dict):
+    # 확장자 제거 (e.g., "124.nii" → "124")
+    case_id = Path(case_id).stem
+    
     # load paths & config
     data_dir     = Path(os.environ.get("DATA_DIR", cfg["data_dir"]))
     raw_path     = data_dir / "raw"         / f"{case_id}{cfg['extensions']['raw']}"
